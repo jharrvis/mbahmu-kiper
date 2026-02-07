@@ -13,6 +13,19 @@ export class Player {
         this.updateAsset();
     }
 
+    // Getter for ground state (used by Game for double jump detection)
+    get isGrounded() {
+        return !this.isJumping && this.y === CONFIG.GROUND_Y;
+    }
+
+    // Getter/Setter for velocity (alias for clearer code in Game)
+    get velocityY() {
+        return this.velocity;
+    }
+    set velocityY(val) {
+        this.velocity = val;
+    }
+
     jump() {
         if (!this.isJumping) {
             // First Jump

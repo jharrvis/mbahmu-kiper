@@ -41,6 +41,14 @@ export class Game {
         this.lives = CONFIG.LIVES;
         this.speed = CONFIG.INITIAL_SPEED;
 
+        // === NEW ENHANCEMENTS ===
+        this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
+        this.scoreMultiplier = 1;
+        this.survivalTime = 0;
+        this.canDoubleJump = false;
+        this.hasDoubleJumped = false;
+        this.particleContainer = null;
+
         this.lastTime = 0;
         this.obstacleTimer = 0;
         this.itemTimer = 0;
@@ -50,6 +58,24 @@ export class Game {
         this.audioManager = new AudioManager();
         this.initBackgrounds();
         this.initSettings();
+        this.initParticleContainer();
+    }
+
+    // Create particle container for effects
+    initParticleContainer() {
+        this.particleContainer = document.createElement('div');
+        this.particleContainer.id = 'particle-container';
+        this.particleContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
+        `;
+        this.container.appendChild(this.particleContainer);
     }
 
     initBackgrounds() {
@@ -191,7 +217,13 @@ export class Game {
         this.lives = CONFIG.LIVES;
         this.speed = CONFIG.INITIAL_SPEED;
         this.isInvincible = false;
-        this.isInvincible = false;
+
+        // Reset enhancements
+        this.scoreMultiplier = 1;
+        this.survivalTime = 0;
+        this.canDoubleJump = false;
+        this.hasDoubleJumped = false;
+
         this.bgShopsX = 0;
         this.bgBuildingsX = 0;
         this.updateUI();
@@ -239,6 +271,9 @@ export class Game {
     }
 
     update(deltaTime, timeScale) {
+        // Update score multiplier based on survival time
+        this.updateMultiplier(deltaTime);
+
         this.player.update(timeScale);
 
         // Spawning
@@ -269,6 +304,8 @@ export class Game {
                     this.playSFX('cat');
                 }
                 this.playSFX('hit');
+                this.screenShake(15, 300);
+                this.vibrate(100);
                 this.takeDamage();
             }
 
@@ -288,8 +325,19 @@ export class Game {
                 if (item.config.type === 'bad' && !this.isInvincible) {
                     this.playSFX('slip');
                     this.playSFX('hit');
+                    this.screenShake(12, 250);
+                    this.vibrate(80);
                     this.takeDamage();
                 } else if (item.config.type !== 'bad') {
+                    // Spawn particles at item position
+                    const rect = item.element.getBoundingClientRect();
+                    const containerRect = this.container.getBoundingClientRect();
+                    this.spawnParticles(
+                        rect.left - containerRect.left + rect.width / 2,
+                        rect.top - containerRect.top + rect.height / 2,
+                        10
+                    );
+                    this.vibrate(30);
                     this.increaseScore(item.config.points);
                     this.playSFX('collect');
                 }
@@ -377,15 +425,188 @@ export class Game {
     }
 
     increaseScore(amount) {
-        this.score += amount;
+        // Apply score multiplier based on survival time
+        const actualScore = Math.floor(amount * this.scoreMultiplier);
+        this.score += actualScore;
         this.updateUI();
+
         if (this.score % CONFIG.SCORE_INCREMENT_THRESHOLD === 0) {
             this.speed += CONFIG.SPEED_INCREMENT;
         }
     }
 
+    // === VISUAL EFFECTS ===
+
+    // Spawn sparkle particles at position
+    spawnParticles(x, y, count = 8) {
+        const colors = ['#f1c40f', '#e74c3c', '#2ecc71', '#9b59b6', '#3498db'];
+
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            const angle = (Math.PI * 2 / count) * i;
+            const velocity = 3 + Math.random() * 3;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = 8 + Math.random() * 8;
+
+            particle.style.cssText = `
+                position: absolute;
+                left: ${x}px;
+                top: ${y}px;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                border-radius: 50%;
+                pointer-events: none;
+                box-shadow: 0 0 ${size}px ${color};
+            `;
+
+            this.particleContainer.appendChild(particle);
+
+            // Animate particle
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+            let posX = x, posY = y, opacity = 1;
+
+            const animate = () => {
+                posX += vx;
+                posY += vy - 0.5; // slight upward drift
+                opacity -= 0.03;
+
+                particle.style.left = posX + 'px';
+                particle.style.top = posY + 'px';
+                particle.style.opacity = opacity;
+
+                if (opacity > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    particle.remove();
+                }
+            };
+            requestAnimationFrame(animate);
+        }
+    }
+
+    // Screen shake effect
+    screenShake(intensity = 10, duration = 200) {
+        const container = this.container;
+        const startTime = Date.now();
+
+        const shake = () => {
+            const elapsed = Date.now() - startTime;
+            if (elapsed < duration) {
+                const x = (Math.random() - 0.5) * intensity;
+                const y = (Math.random() - 0.5) * intensity;
+                container.style.transform = `translate(${x}px, ${y}px)`;
+                requestAnimationFrame(shake);
+            } else {
+                container.style.transform = '';
+            }
+        };
+        shake();
+    }
+
+    // Vibrate on mobile (haptic feedback)
+    vibrate(pattern = 50) {
+        if ('vibrate' in navigator) {
+            navigator.vibrate(pattern);
+        }
+    }
+
+    // Show high score celebration
+    showHighScoreCelebration() {
+        const celebration = document.createElement('div');
+        celebration.id = 'high-score-celebration';
+        celebration.innerHTML = `
+            <div class="celebration-content">
+                <span class="trophy">🏆</span>
+                <h2>NEW HIGH SCORE!</h2>
+                <p class="score-value">${this.score}</p>
+            </div>
+        `;
+        celebration.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes bounceIn { 
+                0% { transform: scale(0); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+            @keyframes pulse { 
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+            #high-score-celebration .celebration-content {
+                text-align: center;
+                color: white;
+                animation: bounceIn 0.5s ease;
+            }
+            #high-score-celebration .trophy {
+                font-size: 80px;
+                display: block;
+                animation: pulse 1s infinite;
+            }
+            #high-score-celebration h2 {
+                font-size: 36px;
+                color: #f1c40f;
+                text-shadow: 0 0 20px #f1c40f;
+                margin: 20px 0;
+            }
+            #high-score-celebration .score-value {
+                font-size: 48px;
+                font-weight: bold;
+                color: #2ecc71;
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(celebration);
+
+        // Vibrate pattern for celebration
+        this.vibrate([100, 50, 100, 50, 200]);
+
+        // Spawn lots of particles
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                this.spawnParticles(
+                    Math.random() * window.innerWidth,
+                    Math.random() * window.innerHeight,
+                    15
+                );
+            }, i * 200);
+        }
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            celebration.remove();
+            style.remove();
+        }, 3000);
+    }
+
+    // Update score multiplier based on survival time
+    updateMultiplier(deltaTime) {
+        this.survivalTime += deltaTime;
+        // Every 10 seconds, increase multiplier by 0.5 (max 5x)
+        this.scoreMultiplier = Math.min(5, 1 + Math.floor(this.survivalTime / 10000) * 0.5);
+    }
+
     updateUI() {
-        this.scoreBoard.innerText = `Skor: ${this.score}`;
+        const multiplierText = this.scoreMultiplier > 1 ? ` (x${this.scoreMultiplier.toFixed(1)})` : '';
+        this.scoreBoard.innerText = `Skor: ${this.score}${multiplierText}`;
 
         let hearts = "";
         for (let i = 0; i < CONFIG.LIVES; i++) {
@@ -407,13 +628,47 @@ export class Game {
             this.bgm.pause();
             this.bgm.currentTime = 0;
         }
+
+        // Check for new high score
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem('highScore', this.highScore);
+            // Show celebration after a short delay
+            setTimeout(() => {
+                this.showHighScoreCelebration();
+            }, 500);
+        }
+
+        // Vibrate on game over
+        this.vibrate([200, 100, 200]);
     }
 
     handleInput() {
         if (this.isActive && !this.isPaused && this.player) {
-            const jumped = this.player.jump();
-            if (jumped) {
-                this.playSFX('jump');
+            // Double jump support
+            if (!this.player.isGrounded) {
+                // Already in air - try double jump
+                if (this.canDoubleJump && !this.hasDoubleJumped) {
+                    this.player.velocityY = -CONFIG.JUMP_VELOCITY * CONFIG.DOUBLE_JUMP_VELOCITY_MULTIPLIER;
+                    this.hasDoubleJumped = true;
+                    this.playSFX('jump');
+                    // Spawn particles on double jump
+                    const playerRect = this.player.element.getBoundingClientRect();
+                    const containerRect = this.container.getBoundingClientRect();
+                    this.spawnParticles(
+                        playerRect.left - containerRect.left + playerRect.width / 2,
+                        playerRect.bottom - containerRect.top,
+                        6
+                    );
+                }
+            } else {
+                // On ground - normal jump
+                const jumped = this.player.jump();
+                if (jumped) {
+                    this.playSFX('jump');
+                    this.canDoubleJump = true;
+                    this.hasDoubleJumped = false;
+                }
             }
         }
     }
