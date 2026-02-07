@@ -2,7 +2,7 @@
 export const CONFIG = {
     GRAVITY: 0.065,          // Reduced for smoother, more floaty jump
     JUMP_VELOCITY: 2.6,      // Slightly higher for responsive feel
-    DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.75, // Second jump ~75% height
+    DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.4, // Second jump ~40% height of first
     INITIAL_SPEED: 7,
     GROUND_Y: 22, // Adjusted to matched sidewalk in new background
     LIVES: 3,
