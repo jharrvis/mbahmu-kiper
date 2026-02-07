@@ -128,7 +128,8 @@ self.addEventListener('fetch', event => {
                 if (cachedResponse) {
                     // Return cache, but also fetch update in background
                     fetch(request).then(networkResponse => {
-                        if (networkResponse.ok) {
+                        // Only cache full responses (not 206 partial or opaque)
+                        if (networkResponse.ok && networkResponse.status === 200) {
                             caches.open(CACHE_NAME).then(cache => {
                                 cache.put(request, networkResponse);
                             });
@@ -140,8 +141,8 @@ self.addEventListener('fetch', event => {
 
                 // Not in cache, fetch from network
                 return fetch(request).then(response => {
-                    // Cache the new resource
-                    if (response.ok) {
+                    // Only cache full 200 responses (not 206 partial)
+                    if (response.ok && response.status === 200) {
                         const responseClone = response.clone();
                         caches.open(CACHE_NAME).then(cache => {
                             cache.put(request, responseClone);

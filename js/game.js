@@ -212,7 +212,6 @@ export class Game {
         this.bgPedestrians.style.transform = 'translateX(0px)';
         this.bgDecor.style.transform = 'translateX(0px)';
         this.isPaused = false;
-        this.pauseBtn.innerText = "⏸️";
         this.overlay.style.display = 'none';
     }
 
