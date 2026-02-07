@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nenek Gaul Naik Scooter - Edisi Indonesia</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="custom-cursor"></div>
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+    </script>
+
+    <div id="game-container">
+        <div id="ui-container">
+            <div id="score-board">Skor: 0</div>
+            <div id="lives-container">
+                Nyawa: <span id="hearts-display">❤️❤️❤️</span>
+            </div>
+            <button id="pause-btn">⏸️</button>
+        </div>
+
+        <!-- Background Layers -->
+        <div class="layer" id="bg-buildings"></div>
+        <div class="layer" id="bg-shops"></div>
+        <div class="layer" id="bg-pedestrians"></div>
+        <div class="layer" id="bg-decor"></div>
+
+        <!-- Entities are now dynamically added by JS -->
+
+        <div id="overlay">
+            <div class="intro-container">
+                <img src="assets/img/nenek1.webp" alt="Nenek" class="intro-character">
+                <h1 id="status-title">Nenek Gaul Scooter</h1>
+                <p id="status-msg" class="intro-subtitle">Bantu Nenek mengumpulkan buah & hindari rintangan!</p>
+
+                <div class="intro-items-grid">
+                    <div class="intro-card collect">
+                        <span class="card-label">✅ AMBIL</span>
+                        <div class="card-items">
+                            <div class="card-item"><img src="assets/img/apple.webp" width="30"><span>+10</span></div>
+                            <div class="card-item"><img src="assets/img/jeruk.webp" width="30"><span>+10</span></div>
+                            <div class="card-item"><img src="assets/img/cherry.webp" width="30"><span>+15</span></div>
+                        </div>
+                    </div>
+                    <div class="intro-card avoid">
+                        <span class="card-label">❌ HINDARI</span>
+                        <div class="card-items">
+                            <img src="assets/img/banana.webp" class="card-obstacle" alt="Pisang">
+                            <img src="assets/img/hydrant.webp" class="card-obstacle" alt="Hydrant">
+                            <img src="assets/img/kucing1.webp" class="card-obstacle" alt="Kucing">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="intro-controls">
+                    <span>⬆️ / SPASI = Loncat</span>
+                    <span>⏸️ = Pause</span>
+                </div>
+
+                <button class="btn" onclick="startGame()">🎮 MAIN SEKARANG</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

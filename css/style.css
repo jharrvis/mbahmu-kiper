@@ -1,0 +1,327 @@
+:root {
+    --sky-color: #74b9ff;
+    --road-color: #636e72;
+    --sidewalk-color: #b2bec3;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--sky-color);
+    user-select: none;
+    touch-action: none;
+    cursor: none;
+}
+
+#custom-cursor {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    pointer-events: none;
+    z-index: 9999;
+    background-image: url('../assets/img/cursor.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: translate(-5px, -5px);
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #74b9ff 0%, #81ecec 50%, #b2bec3 70%, #b2bec3 75%, #636e72 75%, #2d3436 100%);
+}
+
+/* Layer-layer Parallax */
+.layer {
+    position: absolute;
+    bottom: 30%;
+    display: flex;
+    white-space: nowrap;
+    will-change: transform;
+}
+
+#bg-buildings {
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../assets/img/background-gedung.jpg');
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    position: absolute;
+    bottom: 20%;
+    opacity: 0.3;
+    /* Samar-samar */
+}
+
+#bg-shops {
+    z-index: 1;
+    width: 300%;
+    /* Perbesar width agar gambar tidak gepeng */
+    height: 85%;
+    /* Perbesar height agar toko terlihat lebih jelas */
+    background-image: url('../assets/img/background-toko.webp');
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    /* Maintain aspect ratio based on height */
+    position: absolute;
+    bottom: 8.5%;
+    /* Turunkan sedikit lagi agar pas */
+}
+
+#bg-pedestrians {
+    z-index: 2;
+    bottom: 22%;
+    width: 500%;
+    height: 150px;
+    position: absolute;
+    left: 0;
+}
+
+#bg-decor {
+    z-index: 3;
+    bottom: 25%;
+}
+
+.shop {
+    width: 250px;
+    height: 180px;
+    margin-right: 80px;
+    position: relative;
+}
+
+.pedestrian {
+    position: absolute;
+    bottom: 0;
+    width: 120px;
+    height: auto;
+    z-index: 2;
+}
+
+.gerobak {
+    width: 100px;
+    height: 80px;
+    margin-right: 400px;
+}
+
+/* Karakter Nenek */
+#player {
+    position: absolute;
+    width: 150px;
+    height: 180px;
+    bottom: 15%;
+    left: 100px;
+    z-index: 10;
+    transition: opacity 0.1s;
+    /* Untuk efek berkedip */
+}
+
+.obstacle,
+.item {
+    position: absolute;
+    bottom: 22%;
+    /* Match new GROUND_Y */
+    right: -100px;
+    z-index: 5;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+#ui-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+#score-board,
+#lives-container,
+#pause-btn {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d3436;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 20px;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+#pause-btn:active {
+    transform: scale(0.95);
+}
+
+.heart {
+    color: #e74c3c;
+    font-size: 24px;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 200;
+}
+
+.intro-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    max-width: 500px;
+    padding: 20px;
+}
+
+.intro-character {
+    width: 100px;
+    height: 120px;
+    object-fit: contain;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+#status-title {
+    margin: 0;
+    font-size: 36px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.intro-subtitle {
+    margin: 0;
+    font-size: 16px;
+    color: #b2bec3;
+}
+
+.intro-items-grid {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.intro-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    min-width: 140px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.intro-card.collect {
+    border-color: rgba(46, 204, 113, 0.5);
+    background: rgba(46, 204, 113, 0.15);
+}
+
+.intro-card.avoid {
+    border-color: rgba(231, 76, 60, 0.5);
+    background: rgba(231, 76, 60, 0.15);
+}
+
+.card-label {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.card-items {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+
+.card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 28px;
+}
+
+.card-item span {
+    font-size: 12px;
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.card-obstacle {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+.intro-controls {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #dfe6e9;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 20px;
+    border-radius: 20px;
+}
+
+.btn {
+    padding: 15px 45px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #2d3436;
+    background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #d4ac0d, 0 8px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 #d4ac0d, 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #d4ac0d;
+}
+
+.instructions {
+    margin-top: 15px;
+    font-size: 18px;
+    text-align: center;
+    line-height: 1.6;
+    color: #ecf0f1;
+}
