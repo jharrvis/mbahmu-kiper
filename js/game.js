@@ -1,6 +1,7 @@
 import { CONFIG } from './config.js';
 import { ASSETS, createPedestrianSVG, createGerobakSVG } from './assets.js';
 import { Player, Obstacle, Item } from './entities.js';
+import { AudioManager } from './audio-manager.js';
 
 export class Game {
     constructor() {
@@ -47,7 +48,9 @@ export class Game {
         this.nextObstacleTime = 0;
         this.nextItemTime = 0;
 
+        this.audioManager = new AudioManager();
         this.initBackgrounds();
+        this.initSettings();
 
         // Event Listener for Pause
         this.pauseBtn.addEventListener('click', () => this.togglePause());
@@ -62,6 +65,35 @@ export class Game {
         // Shops now handled via CSS background-image
         this.createPedestrians();
         // this.createDecor(); // Temporarily disabled
+    }
+
+    initSettings() {
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettings = document.getElementById('close-settings');
+        const toggleBGM = document.getElementById('toggle-bgm');
+        const toggleSFX = document.getElementById('toggle-sfx');
+
+        // Load saved settings
+        toggleBGM.checked = this.audioManager.bgmEnabled;
+        toggleSFX.checked = this.audioManager.sfxEnabled;
+
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('active');
+            if (this.isActive) this.togglePause();
+        });
+
+        closeSettings.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+
+        toggleBGM.addEventListener('change', () => {
+            this.audioManager.toggleBGM();
+        });
+
+        toggleSFX.addEventListener('change', () => {
+            this.audioManager.toggleSFX();
+        });
     }
 
     createPedestrians() {
@@ -417,7 +449,7 @@ export class Game {
         if (sound) {
             sound.currentTime = 0;
             sound.volume = 0.8;
-            sound.play().catch(e => console.log("SFX play failed", e));
+            this.audioManager.playSFX(sound);
         }
     }
 }

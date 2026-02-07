@@ -4,6 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#f1c40f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Nenek Scooter">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+
     <title>Nenek Gaul Naik Scooter - Edisi Indonesia</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -18,13 +29,27 @@
         });
     </script>
 
-    <div id="game-container">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <img src="assets/img/nenek1.webp" alt="Nenek" class="loading-character">
+            <h1>Nenek Gaul Scooter</h1>
+            <div class="progress-container">
+                <div id="load-progress" class="progress-bar"></div>
+            </div>
+            <p id="load-percent">0%</p>
+            <p class="loading-tip">Memuat aset game...</p>
+        </div>
+    </div>
+
+    <div id="game-container" style="display: none;">
         <div id="ui-container">
             <div id="score-board">Skor: 0</div>
             <div id="lives-container">
                 Nyawa: <span id="hearts-display">❤️❤️❤️</span>
             </div>
             <button id="pause-btn">⏸️</button>
+            <button id="settings-btn">⚙️</button>
         </div>
 
         <!-- Background Layers -->
@@ -66,6 +91,26 @@
                 </div>
 
                 <button class="btn" onclick="startGame()">🎮 MAIN SEKARANG</button>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <h2>⚙️ Pengaturan Audio</h2>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="toggle-bgm" checked>
+                        <span>🎵 Musik Latar (BGM)</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="toggle-sfx" checked>
+                        <span>🔊 Efek Suara (SFX)</span>
+                    </label>
+                </div>
+                <button class="btn" id="close-settings">Tutup</button>
             </div>
         </div>
     </div>
