@@ -8,7 +8,6 @@ export class Game {
         this.container = document.getElementById('game-container');
         this.scoreBoard = document.getElementById('score-board');
         this.heartsDisplay = document.getElementById('hearts-display');
-        this.pauseBtn = document.getElementById('pause-btn'); // Add reference
         this.overlay = document.getElementById('overlay');
         this.statusTitle = document.getElementById('status-title');
         this.statusMsg = document.getElementById('status-msg');
@@ -51,9 +50,6 @@ export class Game {
         this.audioManager = new AudioManager();
         this.initBackgrounds();
         this.initSettings();
-
-        // Event Listener for Pause
-        this.pauseBtn.addEventListener('click', () => this.togglePause());
     }
 
     initBackgrounds() {
@@ -80,9 +76,26 @@ export class Game {
 
         settingsBtn.addEventListener('click', () => {
             settingsModal.classList.add('active');
-            if (this.isActive) this.togglePause();
+            // Pause game when opening settings
+            if (this.isActive && !this.isPaused) {
+                this.isPaused = true;
+            }
         });
 
+        // Resume button - close modal and resume game
+        const resumeBtn = document.getElementById('resume-game');
+        resumeBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+            if (this.isActive && this.isPaused) {
+                this.isPaused = false;
+                this.lastTime = performance.now();
+                if (this.bgm && this.audioManager.bgmEnabled) {
+                    this.bgm.play();
+                }
+            }
+        });
+
+        // Close button - just close modal (don't auto resume)
         closeSettings.addEventListener('click', () => {
             settingsModal.classList.remove('active');
         });
@@ -93,7 +106,7 @@ export class Game {
             // Apply immediately
             if (!this.audioManager.bgmEnabled && this.bgm) {
                 this.bgm.pause();
-            } else if (this.audioManager.bgmEnabled && this.bgm) {
+            } else if (this.audioManager.bgmEnabled && this.bgm && this.isActive && !this.isPaused) {
                 this.bgm.play();
             }
         });

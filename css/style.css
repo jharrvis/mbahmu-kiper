@@ -15,6 +15,17 @@ body {
     cursor: none;
 }
 
+/* Hide custom cursor on mobile/touch devices */
+@media (hover: none) and (pointer: coarse) {
+    body {
+        cursor: auto;
+    }
+
+    #custom-cursor {
+        display: none !important;
+    }
+}
+
 #custom-cursor {
     position: fixed;
     width: 32px;
@@ -360,6 +371,24 @@ body {
     box-shadow: 0 2px 0 #d4ac0d;
 }
 
+.btn-primary {
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+    box-shadow: 0 6px 0 #1e8449, 0 8px 20px rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 8px 0 #1e8449, 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(180deg, #95a5a6 0%, #7f8c8d 100%);
+    box-shadow: 0 6px 0 #5d6d7e, 0 8px 20px rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 16px;
+    padding: 10px 30px;
+}
+
 .instructions {
     margin-top: 15px;
     font-size: 18px;
@@ -516,7 +545,7 @@ body {
     height: 60px;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 100;
+    z-index: 500;
     transition: transform 0.2s;
 }
 
