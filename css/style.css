@@ -35,6 +35,48 @@ body {
     background: linear-gradient(to bottom, #74b9ff 0%, #81ecec 50%, #b2bec3 70%, #b2bec3 75%, #636e72 75%, #2d3436 100%);
 }
 
+/* UI Container - Top Left Stats */
+#ui-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#score-board,
+#lives-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Pause Button - Bottom Left */
+#pause-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 28px;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: transform 0.2s;
+}
+
+#pause-btn:hover {
+    transform: scale(1.1);
+}
+
 /* Layer-layer Parallax */
 .layer {
     position: absolute;
@@ -461,19 +503,19 @@ body {
     }
 }
 
-/* Settings Button */
+/* Settings Button - Top Right */
 #settings-btn {
     position: absolute;
     top: 20px;
-    right: 70px;
-    font-size: 24px;
-    background: rgba(255, 255, 255, 0.9);
+    right: 20px;
+    font-size: 28px;
+    background: rgba(255, 255, 255, 0.95);
     border: none;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 100;
     transition: transform 0.2s;
 }

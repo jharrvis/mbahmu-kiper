@@ -87,12 +87,20 @@ export class Game {
             settingsModal.classList.remove('active');
         });
 
-        toggleBGM.addEventListener('change', () => {
-            this.audioManager.toggleBGM();
+        toggleBGM.addEventListener('change', (e) => {
+            this.audioManager.bgmEnabled = e.target.checked;
+            this.audioManager.saveSettings();
+            // Apply immediately
+            if (!this.audioManager.bgmEnabled && this.bgm) {
+                this.bgm.pause();
+            } else if (this.audioManager.bgmEnabled && this.bgm) {
+                this.bgm.play();
+            }
         });
 
-        toggleSFX.addEventListener('change', () => {
-            this.audioManager.toggleSFX();
+        toggleSFX.addEventListener('change', (e) => {
+            this.audioManager.sfxEnabled = e.target.checked;
+            this.audioManager.saveSettings();
         });
     }
 
