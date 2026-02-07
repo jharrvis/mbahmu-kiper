@@ -19,7 +19,7 @@ const urlsToCache = [
     '/assets/img/jeruk.webp',
     '/assets/img/cherry.webp',
     '/assets/img/banana.webp',
-    '/assets/img/pisang.webp',
+    '/assets/img/kulit-pisang.webp',
     '/assets/img/background-toko.webp',
     '/assets/img/background-gedung.jpg',
     '/assets/img/pedestrian1.webp',
