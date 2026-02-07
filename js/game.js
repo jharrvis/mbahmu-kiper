@@ -7,6 +7,7 @@ export class Game {
     constructor() {
         this.container = document.getElementById('game-container');
         this.scoreBoard = document.getElementById('score-board');
+        this.highScoreBoard = document.getElementById('highscore-board');
         this.heartsDisplay = document.getElementById('hearts-display');
         this.overlay = document.getElementById('overlay');
         this.statusTitle = document.getElementById('status-title');
@@ -672,7 +673,8 @@ export class Game {
 
     updateUI() {
         const multiplierText = this.scoreMultiplier > 1 ? ` (x${this.scoreMultiplier.toFixed(1)})` : '';
-        this.scoreBoard.innerText = `Skor: ${this.score}${multiplierText}`;
+        this.scoreBoard.innerText = `${this.score}${multiplierText}`;
+        this.highScoreBoard.innerText = this.highScore;
 
         let hearts = "";
         for (let i = 0; i < CONFIG.LIVES; i++) {

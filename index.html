@@ -49,9 +49,20 @@
     <div id="game-container" style="display: none;">
         <!-- Top UI Bar -->
         <div id="ui-container">
-            <div id="score-board">Skor: 0</div>
-            <div id="lives-container">
-                Nyawa: <span id="hearts-display">❤️❤️❤️</span>
+            <div class="hud-panel">
+                <div class="score-group">
+                    <div class="hud-item score">
+                        <span class="hud-label">SKOR</span>
+                        <span id="score-board">0</span>
+                    </div>
+                    <div class="hud-item highscore">
+                        <span class="hud-label">TERTINGGI</span>
+                        <span id="highscore-board">0</span>
+                    </div>
+                </div>
+                <div id="lives-container">
+                    <span id="hearts-display"></span>
+                </div>
             </div>
         </div>
 

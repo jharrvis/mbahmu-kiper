@@ -5,7 +5,7 @@ export const CONFIG = {
     DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.5, // Second jump ~50% of first - good for extra height
     INITIAL_SPEED: 7,
     GROUND_Y: 22, // Adjusted to matched sidewalk in new background
-    LIVES: 3,
+    LIVES: 5,
     SPEED_INCREMENT: 0.3,
     SCORE_INCREMENT_THRESHOLD: 25,
     INVINCIBILITY_DURATION: 2000, // ms
