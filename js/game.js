@@ -409,7 +409,7 @@ export class Game {
             // Reset update time to prevent huge delta jump
             this.lastTime = performance.now();
 
-            if (this.bgm) this.bgm.play();
+            if (this.bgm) this.audioManager.playBGM(this.bgm);
         }
     }
 
@@ -426,13 +426,8 @@ export class Game {
         this.bgm.loop = true;
         this.bgm.volume = CONFIG.BGM_VOLUME;
 
-        // Handle autoplay policy promises
-        const playPromise = this.bgm.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Auto-play was prevented. Please interact with the document first.");
-            });
-        }
+        // Route through AudioManager to respect mute settings
+        this.audioManager.playBGM(this.bgm);
     }
 
     playSFX(key) {
