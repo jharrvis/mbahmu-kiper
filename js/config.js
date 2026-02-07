@@ -1,8 +1,8 @@
 // Game Configuration
 export const CONFIG = {
-    GRAVITY: 0.09,
-    JUMP_VELOCITY: 2.4,
-    DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.7, // Loncat kedua tingginya ~setengah (0.7x velocity)
+    GRAVITY: 0.065,          // Reduced for smoother, more floaty jump
+    JUMP_VELOCITY: 2.6,      // Slightly higher for responsive feel
+    DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.75, // Second jump ~75% height
     INITIAL_SPEED: 7,
     GROUND_Y: 22, // Adjusted to matched sidewalk in new background
     LIVES: 3,

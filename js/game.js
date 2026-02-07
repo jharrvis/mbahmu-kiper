@@ -579,21 +579,87 @@ export class Game {
         // Vibrate pattern for celebration
         this.vibrate([100, 50, 100, 50, 200]);
 
-        // Spawn lots of particles
-        for (let i = 0; i < 5; i++) {
+        // === CONFETTI RAIN EFFECT ===
+        const confettiColors = ['#f1c40f', '#e74c3c', '#2ecc71', '#9b59b6', '#3498db', '#e67e22', '#1abc9c'];
+        const confettiContainer = document.createElement('div');
+        confettiContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1001;
+            overflow: hidden;
+        `;
+        document.body.appendChild(confettiContainer);
+
+        // Spawn confetti pieces
+        const spawnConfetti = () => {
+            for (let i = 0; i < 8; i++) {
+                const confetti = document.createElement('div');
+                const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                const size = 8 + Math.random() * 12;
+                const startX = Math.random() * window.innerWidth;
+                const rotation = Math.random() * 360;
+                const duration = 2 + Math.random() * 2;
+
+                confetti.style.cssText = `
+                    position: absolute;
+                    left: ${startX}px;
+                    top: -20px;
+                    width: ${size}px;
+                    height: ${size * 0.6}px;
+                    background: ${color};
+                    border-radius: 2px;
+                    transform: rotate(${rotation}deg);
+                    animation: confettiFall ${duration}s linear forwards;
+                `;
+                confettiContainer.appendChild(confetti);
+
+                // Remove after animation
+                setTimeout(() => confetti.remove(), duration * 1000);
+            }
+        };
+
+        // Add confetti animation style
+        const confettiStyle = document.createElement('style');
+        confettiStyle.textContent = `
+            @keyframes confettiFall {
+                0% { 
+                    transform: translateY(0) rotate(0deg); 
+                    opacity: 1;
+                }
+                100% { 
+                    transform: translateY(${window.innerHeight + 50}px) rotate(720deg); 
+                    opacity: 0.5;
+                }
+            }
+        `;
+        document.head.appendChild(confettiStyle);
+
+        // Spawn confetti waves
+        spawnConfetti();
+        const confettiInterval = setInterval(spawnConfetti, 300);
+
+        // Also spawn sparkle particles around celebration
+        for (let i = 0; i < 8; i++) {
             setTimeout(() => {
                 this.spawnParticles(
-                    Math.random() * window.innerWidth,
-                    Math.random() * window.innerHeight,
-                    15
+                    window.innerWidth / 2 + (Math.random() - 0.5) * 300,
+                    window.innerHeight / 2 + (Math.random() - 0.5) * 200,
+                    12
                 );
-            }, i * 200);
+            }, i * 150);
         }
 
         // Auto remove after 3 seconds
         setTimeout(() => {
             celebration.remove();
             style.remove();
+            confettiContainer.remove();
+            confettiStyle.remove();
+            clearInterval(confettiInterval);
         }, 3000);
     }
 
@@ -645,29 +711,21 @@ export class Game {
 
     handleInput() {
         if (this.isActive && !this.isPaused && this.player) {
-            // Double jump support
-            if (!this.player.isGrounded) {
-                // Already in air - try double jump
-                if (this.canDoubleJump && !this.hasDoubleJumped) {
-                    this.player.velocityY = -CONFIG.JUMP_VELOCITY * CONFIG.DOUBLE_JUMP_VELOCITY_MULTIPLIER;
-                    this.hasDoubleJumped = true;
-                    this.playSFX('jump');
-                    // Spawn particles on double jump
+            // Use Player's built-in jump() which handles double jump internally
+            const jumped = this.player.jump();
+            if (jumped) {
+                this.playSFX('jump');
+
+                // Spawn particles on double jump (when in air)
+                if (this.player.jumpCount === 2) {
                     const playerRect = this.player.element.getBoundingClientRect();
                     const containerRect = this.container.getBoundingClientRect();
                     this.spawnParticles(
                         playerRect.left - containerRect.left + playerRect.width / 2,
                         playerRect.bottom - containerRect.top,
-                        6
+                        8
                     );
-                }
-            } else {
-                // On ground - normal jump
-                const jumped = this.player.jump();
-                if (jumped) {
-                    this.playSFX('jump');
-                    this.canDoubleJump = true;
-                    this.hasDoubleJumped = false;
+                    this.vibrate(40);
                 }
             }
         }
