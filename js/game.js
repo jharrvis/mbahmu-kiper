@@ -69,6 +69,7 @@ export class Game {
         const closeSettings = document.getElementById('close-settings');
         const toggleBGM = document.getElementById('toggle-bgm');
         const toggleSFX = document.getElementById('toggle-sfx');
+        const startBtn = document.getElementById('start-btn');
 
         // Load saved settings
         toggleBGM.checked = this.audioManager.bgmEnabled;
@@ -76,28 +77,42 @@ export class Game {
 
         settingsBtn.addEventListener('click', () => {
             settingsModal.classList.add('active');
-            // Pause game when opening settings
+            // Pause game when opening settings (during gameplay)
             if (this.isActive && !this.isPaused) {
                 this.isPaused = true;
+                // Pause BGM
+                if (this.bgm) this.bgm.pause();
             }
         });
 
-        // Resume button - close modal and resume game
-        const resumeBtn = document.getElementById('resume-game');
-        resumeBtn.addEventListener('click', () => {
+        // Close settings - show overlay with LANJUT MAIN if game was paused
+        closeSettings.addEventListener('click', () => {
             settingsModal.classList.remove('active');
+
+            // If game is active but paused, show overlay with resume option
             if (this.isActive && this.isPaused) {
+                this.overlay.style.display = 'flex';
+                this.statusTitle.textContent = '⏸️ PAUSED';
+                this.statusMsg.textContent = 'Klik tombol untuk lanjut main';
+                startBtn.textContent = '▶️ LANJUT MAIN';
+            }
+        });
+
+        // Start/Resume button handler
+        startBtn.addEventListener('click', () => {
+            if (this.isPaused && this.isActive) {
+                // Resume game
                 this.isPaused = false;
+                this.overlay.style.display = 'none';
+                startBtn.textContent = '🎮 MAIN SEKARANG';
                 this.lastTime = performance.now();
                 if (this.bgm && this.audioManager.bgmEnabled) {
                     this.bgm.play();
                 }
+            } else {
+                // Start new game
+                this.start();
             }
-        });
-
-        // Close button - just close modal (don't auto resume)
-        closeSettings.addEventListener('click', () => {
-            settingsModal.classList.remove('active');
         });
 
         toggleBGM.addEventListener('change', (e) => {
