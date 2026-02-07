@@ -1,4 +1,7 @@
-const CACHE_NAME = 'nenek-scooter-v1';
+const CACHE_NAME = 'nenek-scooter-v2';
+const STATIC_CACHE = 'nenek-static-v2';
+
+// All assets to cache for offline play
 const urlsToCache = [
     '/',
     '/index.html',
@@ -10,6 +13,7 @@ const urlsToCache = [
     '/js/assets.js',
     '/js/config.js',
     '/js/preloader.js',
+    '/js/audio-manager.js',
     '/assets/img/nenek1.webp',
     '/assets/img/nenek2.webp',
     '/assets/img/hydrant.webp',
@@ -41,36 +45,117 @@ const urlsToCache = [
     '/assets/audio/cat.mp3'
 ];
 
+// Install: Cache all static assets
 self.addEventListener('install', event => {
-    console.log('Service Worker: Installing...');
+    console.log('[SW] Installing Service Worker v2...');
+
+    // Skip waiting to activate immediately
+    self.skipWaiting();
+
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Service Worker: Caching files');
+                console.log('[SW] Caching all static assets...');
                 return cache.addAll(urlsToCache);
             })
-    );
-});
-
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Return cached version or fetch new
-                return response || fetch(event.request);
+            .then(() => {
+                console.log('[SW] All assets cached successfully!');
+            })
+            .catch(err => {
+                console.error('[SW] Cache failed:', err);
             })
     );
 });
 
+// Activate: Clean old caches and take control immediately
 self.addEventListener('activate', event => {
-    console.log('Service Worker: Activating...');
+    console.log('[SW] Activating Service Worker v2...');
+
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames
-                    .filter(name => name !== CACHE_NAME)
-                    .map(name => caches.delete(name))
-            );
-        })
+        Promise.all([
+            // Clean up old caches
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames
+                        .filter(name => name !== CACHE_NAME && name !== STATIC_CACHE)
+                        .map(name => {
+                            console.log('[SW] Deleting old cache:', name);
+                            return caches.delete(name);
+                        })
+                );
+            }),
+            // Take control of all clients immediately
+            self.clients.claim()
+        ])
     );
+});
+
+// Fetch: Cache-first strategy with network fallback
+// Also implements "stale-while-revalidate" for HTML to get updates
+self.addEventListener('fetch', event => {
+    const request = event.request;
+    const url = new URL(request.url);
+
+    // Only handle same-origin requests
+    if (url.origin !== location.origin) {
+        return;
+    }
+
+    // For HTML pages: Network first with cache fallback (ensures updates)
+    if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    // Update cache with new version
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(request, responseClone);
+                    });
+                    return response;
+                })
+                .catch(() => {
+                    // Offline: serve from cache
+                    return caches.match(request) || caches.match('/index.html');
+                })
+        );
+        return;
+    }
+
+    // For other assets: Cache first with network fallback
+    event.respondWith(
+        caches.match(request)
+            .then(cachedResponse => {
+                if (cachedResponse) {
+                    // Return cache, but also fetch update in background
+                    fetch(request).then(networkResponse => {
+                        if (networkResponse.ok) {
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(request, networkResponse);
+                            });
+                        }
+                    }).catch(() => { });
+
+                    return cachedResponse;
+                }
+
+                // Not in cache, fetch from network
+                return fetch(request).then(response => {
+                    // Cache the new resource
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(request, responseClone);
+                        });
+                    }
+                    return response;
+                });
+            })
+    );
+});
+
+// Listen for messages from main app (e.g., skip waiting)
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
