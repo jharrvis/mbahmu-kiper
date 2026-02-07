@@ -1,8 +1,8 @@
 // Game Configuration
 export const CONFIG = {
-    GRAVITY: 0.065,          // Reduced for smoother, more floaty jump
-    JUMP_VELOCITY: 1.3,      // Reduced - jump height just enough to reach fruits
-    DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.4, // Second jump ~40% height of first
+    GRAVITY: 0.065,          // Smooth, floaty jump
+    JUMP_VELOCITY: 1.7,      // Comfortable height - clears obstacles & fruits
+    DOUBLE_JUMP_VELOCITY_MULTIPLIER: 0.5, // Second jump ~50% of first - good for extra height
     INITIAL_SPEED: 7,
     GROUND_Y: 22, // Adjusted to matched sidewalk in new background
     LIVES: 3,
