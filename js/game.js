@@ -305,7 +305,7 @@ export class Game {
                     this.playSFX('cat');
                 }
                 this.playSFX('hit');
-                this.screenShake(15, 300);
+                // this.screenShake(15, 300); // Effect removed by request
                 this.vibrate(100);
                 this.takeDamage();
             }
@@ -326,7 +326,7 @@ export class Game {
                 if (item.config.type === 'bad' && !this.isInvincible) {
                     this.playSFX('slip');
                     this.playSFX('hit');
-                    this.screenShake(12, 250);
+                    // this.screenShake(12, 250); // Effect removed by request
                     this.vibrate(80);
                     this.takeDamage();
                 } else if (item.config.type !== 'bad') {
