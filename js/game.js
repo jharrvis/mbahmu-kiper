@@ -1,7 +1,9 @@
-import { CONFIG } from './config.js';
+import { CONFIG, STORE_NAMES, STORE_COLORS } from './config.js';
 import { ASSETS, createPedestrianSVG, createGerobakSVG } from './assets.js';
 import { Player, Obstacle, Item } from './entities.js';
 import { AudioManager } from './audio-manager.js';
+import { currentUser } from './auth.js';
+import { saveScore } from './leaderboard.js';
 
 export class Game {
     constructor() {
@@ -697,15 +699,24 @@ export class Game {
             this.bgm.currentTime = 0;
         }
 
-        // Check for new high score
+        // Update High Score
         if (this.score > this.highScore) {
             this.highScore = this.score;
             localStorage.setItem('highScore', this.highScore);
-            // Show celebration after a short delay
-            setTimeout(() => {
-                this.showHighScoreCelebration();
-            }, 500);
+            this.showHighScoreCelebration();
         }
+
+        // Save to Firebase Leaderboard
+        if (currentUser) {
+            saveScore(currentUser, this.score).then(isNewRecord => {
+                if (isNewRecord) console.log("New Global High Score synced!");
+            });
+        }
+
+        setTimeout(() => {
+            alert(`Game Over! Skor kamu: ${this.score}`);
+            this.reset();
+        }, 100);
 
         // Vibrate on game over
         this.vibrate([200, 100, 200]);

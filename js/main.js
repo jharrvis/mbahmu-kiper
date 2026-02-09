@@ -1,5 +1,8 @@
 import { Game } from './game.js';
 import { AssetPreloader } from './preloader.js';
+import { initAuth, currentUser } from './auth.js';
+import { getLeaderboard } from './leaderboard.js';
+import { submitFeedback } from './feedback.js';
 
 // Service Worker Registration for PWA with auto-update
 if ('serviceWorker' in navigator) {
@@ -48,54 +51,37 @@ function showUpdateNotification() {
     notification.style.cssText = `
         position: fixed;
         bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        right: 20px;
+        background: #2ecc71;
         color: white;
-        padding: 15px 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        z-index: 10000;
-        text-align: center;
-        font-family: 'Segoe UI', sans-serif;
-    `;
-    notification.querySelector('button').style.cssText = `
-        background: white;
-        color: #667eea;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-family: sans-serif;
     `;
     document.body.appendChild(notification);
 }
 
-// Collect all asset paths
+// Assets to preload
 const imagePaths = [
     'assets/img/nenek1.webp',
-    'assets/img/nenek2.webp',
-    'assets/img/hydrant.webp',
-    'assets/img/kucing1.webp',
-    'assets/img/kucing2.webp',
-    'assets/img/apple.webp',
-    'assets/img/jeruk.webp',
-    'assets/img/cherry.webp',
-    'assets/img/banana.webp',
-    'assets/img/kulit-pisang.webp',
-    'assets/img/background-toko.webp',
-    'assets/img/background-gedung.jpg',
-    'assets/img/pedestrian1.webp',
-    'assets/img/pedestrian2.webp',
-    'assets/img/pedestrian3.webp',
-    'assets/img/cursor.webp'
+    'assets/img/nenek2.webp', // Jumping
+    'assets/img/nenek3.webp', // Double Jump (maybe same as jump)
+    'assets/img/background-toko.webp', // New Background
+    'assets/img/background-gedung.png', // Fallback/Layer
+    'assets/img/obstacle-car.png',
+    'assets/img/obstacle-rock.png',
+    'assets/img/obstacle-cat.png',
+    'assets/img/item-pisang.png',
+    'assets/img/item-apel.png'
 ];
 
 const audioPaths = [
-    'assets/audio/backsound1.mp3',
-    'assets/audio/backsounde2.mp3',
-    'assets/audio/items.wav',
+    'assets/audio/bgm-dalan-liyane.mp3',
     'assets/audio/aduh1.wav',
     'assets/audio/aduh2.wav',
     'assets/audio/aduh3.wav',
@@ -109,6 +95,9 @@ const audioPaths = [
 ];
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Initialize Auth UI
+    initAuth('login-btn', 'user-profile', 'user-name', 'user-avatar');
+
     // Preload and init
     const preloader = new AssetPreloader();
 
@@ -150,6 +139,84 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('Game ready! All assets loaded.');
         } else {
             alert('Gagal memuat aset game. Coba refresh halaman.');
+        }
+    });
+
+    // === UI Handlers for Leaderboard & Feedback ===
+
+    // Config Modals
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            document.getElementById(targetId).style.display = 'none';
+        });
+    });
+
+    // Leaderboard
+    const leaderboardBtn = document.getElementById('leaderboard-btn');
+    const leaderboardModal = document.getElementById('leaderboard-modal');
+    const leaderboardBody = document.getElementById('leaderboard-body');
+
+    leaderboardBtn.addEventListener('click', async () => {
+        leaderboardModal.style.display = 'flex';
+        leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>';
+
+        try {
+            const scores = await getLeaderboard();
+            leaderboardBody.innerHTML = '';
+
+            if (scores.length === 0) {
+                leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Belum ada skor. Mainkan sekarang!</td></tr>';
+                return;
+            }
+
+            scores.forEach((s, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${s.photoURL ? `<img src="${s.photoURL}" style="width: 20px; height: 20px; border-radius: 50%;">` : ''}
+                            ${s.displayName || 'Anonymous'}
+                        </div>
+                    </td>
+                    <td>${s.score}</td>
+                `;
+                leaderboardBody.appendChild(tr);
+            });
+        } catch (error) {
+            leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Error loading leaderboard.</td></tr>';
+        }
+    });
+
+    // Feedback
+    const feedbackBtn = document.getElementById('feedback-btn');
+    const feedbackModal = document.getElementById('feedback-modal');
+    const submitFeedbackBtn = document.getElementById('submit-feedback-btn');
+
+    feedbackBtn.addEventListener('click', () => {
+        feedbackModal.style.display = 'flex';
+    });
+
+    submitFeedbackBtn.addEventListener('click', async () => {
+        const category = document.getElementById('feedback-category').value;
+        const message = document.getElementById('feedback-message').value;
+
+        if (!message.trim()) {
+            alert("Pesan tidak boleh kosong!");
+            return;
+        }
+
+        if (confirm("Kirim masukan ini?")) {
+            const success = await submitFeedback(currentUser, message, category);
+            if (success) {
+                alert("Terima kasih! Masukan Anda telah terkirim.");
+                feedbackModal.style.display = 'none';
+                document.getElementById('feedback-message').value = '';
+            } else {
+                alert("Gagal mengirim masukan. Silakan coba lagi nanti.");
+            }
         }
     });
 });

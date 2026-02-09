@@ -64,10 +64,21 @@
                     <span id="hearts-display"></span>
                 </div>
             </div>
+
+            <!-- User Controls -->
+            <div class="user-controls">
+                <button id="login-btn" class="icon-btn" title="Login with Google">🔑</button>
+                <div id="user-profile" class="profile-chip" style="display: none;">
+                    <img id="user-avatar" src="" alt="User">
+                    <span id="user-name"></span>
+                </div>
+                <button id="leaderboard-btn" class="icon-btn" title="Leaderboard">🏆</button>
+                <button id="feedback-btn" class="icon-btn" title="Feedback">💬</button>
+            </div>
         </div>
 
         <!-- Settings Button (top of everything) -->
-        <button id="settings-btn">⚙️</button>
+        <button id="settings-btn" style="top: 80px;">⚙️</button>
 
         <!-- Background Layers -->
         <div class="layer" id="bg-buildings"></div>
@@ -132,6 +143,49 @@
         </div>
     </div>
 
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <h2>🏆 Top Global Leaderboard</h2>
+            <div class="leaderboard-table-container">
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Player</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Rows will be populated by JS -->
+                        <tr>
+                            <td colspan="3">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn close-modal" data-target="leaderboard-modal">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <h2>💬 Kirim Masukan</h2>
+            <p>Laporkan bug atau saran fitur baru!</p>
+            <select id="feedback-category">
+                <option value="suggestion">Saran Fitur</option>
+                <option value="bug">Lapor Bug</option>
+                <option value="other">Lainnya</option>
+            </select>
+            <textarea id="feedback-message" placeholder="Tulis pesanmu di sini..." rows="4"></textarea>
+            <button id="submit-feedback-btn" class="btn">Kirim</button>
+            <button class="btn close-modal" data-target="feedback-modal"
+                style="background: #e74c3c; margin-top: 10px;">Batal</button>
+        </div>
+    </div>
+
+    <script src="js/assets.js" type="module"></script>
     <script type="module" src="js/main.js"></script>
 </body>
 
