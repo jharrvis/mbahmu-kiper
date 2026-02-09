@@ -11,6 +11,7 @@ export const CONFIG = {
     INVINCIBILITY_DURATION: 2000, // ms
     MIN_OBSTACLE_SPAWN_TIME: 850,
     MAX_OBSTACLE_SPAWN_TIME_BASE: 1300,
+    SAWERIA_URL: 'https://saweria.co/nenekscooter',
     ITEM_SPAWN_MIN: 1500,
     ITEM_SPAWN_MAX: 2000,
     PLAYER_HITBOX: {

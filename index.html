@@ -119,13 +119,41 @@
                     </div>
                     <button id="leaderboard-btn" class="menu-icon-btn" title="Leaderboard">🏆</button>
                     <button id="feedback-btn" class="menu-icon-btn" title="Feedback">💬</button>
+                    <button id="donate-btn-menu" class="menu-icon-btn" title="Dukungan (Saweria)"
+                        style="background: #f1c40f; color: #2d3436; border: 2px solid #d4ac0d;">🎁</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="game-over-overlay" class="overlay" style="display: none;">
+            <div class="glass-panel game-over-panel">
+                <h1 class="game-over-title">GAME OVER</h1>
+                <p class="game-over-msg" id="game-over-msg">Yaah, nabrak!</p>
+
+                <div class="result-container">
+                    <div class="result-box">
+                        <span class="result-label">SKOR KAMU</span>
+                        <span class="result-value" id="final-score">0</span>
+                    </div>
+                    <div class="result-box highscore-box">
+                        <span class="result-label">RECORD</span>
+                        <span class="result-value" id="final-highscore">0</span>
+                    </div>
+                </div>
+
+                <div class="game-over-controls">
+                    <button id="restart-btn" class="btn btn-primary">🔄 MAIN LAGI</button>
+                    <button id="menu-btn" class="btn btn-secondary">🏠 MENU UTAMA</button>
+                    <button id="donate-btn-over" class="btn btn-saweria" style="margin-top: 5px;">🎁 DUKUNGAN
+                        (SAWERIA)</button>
                 </div>
             </div>
         </div>
 
         <!-- Settings Modal -->
         <div id="settings-modal" class="modal">
-            <div class="modal-content">
+            <div class="modal-content glass-panel">
                 <h2>⚙️ Pengaturan</h2>
                 <div class="setting-item">
                     <label>
@@ -146,43 +174,58 @@
 
     <!-- Leaderboard Modal -->
     <div id="leaderboard-modal" class="modal">
-        <div class="modal-content">
-            <h2>🏆 Top Global Leaderboard</h2>
-            <div class="leaderboard-table-container">
+        <div class="modal-content glass-panel" style="max-width: 500px; width: 90%;">
+            <div class="modal-header">
+                <h2>🏆 Hall of Fame</h2>
+                <button class="close-icon close-modal" data-target="leaderboard-modal">&times;</button>
+            </div>
+            <div class="leaderboard-table-container custom-scrollbar">
                 <table id="leaderboard-table">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th width="15%">#</th>
                             <th>Player</th>
-                            <th>Score</th>
+                            <th width="25%" style="text-align: right;">Score</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body">
                         <!-- Rows will be populated by JS -->
                         <tr>
-                            <td colspan="3">Loading...</td>
+                            <td colspan="3" style="text-align: center; padding: 20px;">Loading data...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <button class="btn close-modal" data-target="leaderboard-modal">Tutup</button>
         </div>
     </div>
 
     <!-- Feedback Modal -->
     <div id="feedback-modal" class="modal">
-        <div class="modal-content">
-            <h2>💬 Kirim Masukan</h2>
-            <p>Laporkan bug atau saran fitur baru!</p>
-            <select id="feedback-category">
-                <option value="suggestion">Saran Fitur</option>
-                <option value="bug">Lapor Bug</option>
-                <option value="other">Lainnya</option>
-            </select>
-            <textarea id="feedback-message" placeholder="Tulis pesanmu di sini..." rows="4"></textarea>
-            <button id="submit-feedback-btn" class="btn">Kirim</button>
-            <button class="btn close-modal" data-target="feedback-modal"
-                style="background: #e74c3c; margin-top: 10px;">Batal</button>
+        <div class="modal-content glass-panel" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>💬 Masukan & Saran</h2>
+                <button class="close-icon close-modal" data-target="feedback-modal">&times;</button>
+            </div>
+            <p style="color: #dfe6e9; margin-bottom: 20px; text-align: center;">Bantu kami membuat game ini lebih seru!
+            </p>
+
+            <div class="form-group">
+                <label>Kategori</label>
+                <select id="feedback-category" class="glass-input">
+                    <option value="suggestion">💡 Saran Fitur</option>
+                    <option value="bug">🐛 Lapor Bug</option>
+                    <option value="other">📝 Lainnya</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Pesan</label>
+                <textarea id="feedback-message" class="glass-input" placeholder="Tulis pesanmu di sini..."
+                    rows="4"></textarea>
+            </div>
+
+            <button id="submit-feedback-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Kirim
+                Masukan</button>
         </div>
     </div>
 

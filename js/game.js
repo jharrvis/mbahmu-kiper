@@ -714,9 +714,29 @@ export class Game {
         }
 
         setTimeout(() => {
-            alert(`Game Over! Skor kamu: ${this.score}`);
-            this.reset();
-        }, 100);
+            // Show Game Over Overlay instead of alert
+            const gameOverOverlay = document.getElementById('game-over-overlay');
+            const finalScoreEl = document.getElementById('final-score');
+            const finalHighScoreEl = document.getElementById('final-highscore');
+            const gameOverMsg = document.getElementById('game-over-msg');
+
+            finalScoreEl.innerText = this.score;
+            finalHighScoreEl.innerText = this.highScore;
+
+            // Random funny messages based on score
+            const messages = [
+                "Yaah, nabrak! 🤕",
+                "Hati-hati Nek! 🚧",
+                "Coba lagi ya! 💪",
+                "Belum beruntung! 😅",
+                "Awas ada kucing! 🐈"
+            ];
+            gameOverMsg.innerText = msg || messages[Math.floor(Math.random() * messages.length)];
+
+            gameOverOverlay.style.display = 'flex';
+
+            // this.reset(); // Don't reset immediately, wait for user action
+        }, 500);
 
         // Vibrate on game over
         this.vibrate([200, 100, 200]);

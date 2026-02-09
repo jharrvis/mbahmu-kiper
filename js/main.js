@@ -1,4 +1,5 @@
 import { Game } from './game.js';
+import { CONFIG } from './config.js';
 import { AssetPreloader } from './preloader.js';
 import { initAuth, currentUser } from './auth.js';
 import { getLeaderboard } from './leaderboard.js';
@@ -125,11 +126,58 @@ window.addEventListener('DOMContentLoaded', () => {
                 game.start();
             };
 
+            // Game Over Controls
+            const restartBtn = document.getElementById('restart-btn');
+            const menuBtn = document.getElementById('menu-btn');
+            const gameOverOverlay = document.getElementById('game-over-overlay');
+            const startOverlay = document.getElementById('overlay');
+
+            restartBtn.addEventListener('click', () => {
+                gameOverOverlay.style.display = 'none';
+                game.start();
+            });
+
+            menuBtn.addEventListener('click', () => {
+                gameOverOverlay.style.display = 'none';
+                startOverlay.style.display = 'flex';
+                // Reset game state for background visual
+                game.reset();
+            });
+
+            // Donate Buttons (Iframe Implementation)
+            const donateBtnMenu = document.getElementById('donate-btn-menu');
+            const donateBtnOver = document.getElementById('donate-btn-over');
+            const donationModal = document.getElementById('donation-modal');
+            const saweriaFrame = document.getElementById('saweria-frame');
+            const saweriaFallback = document.getElementById('saweria-fallback-btn');
+
+            const openDonationModal = () => {
+                donationModal.style.display = 'flex';
+                // Only set src when opening to save resources/bandwidth
+                if (!saweriaFrame.src || saweriaFrame.src === 'about:blank' || saweriaFrame.src === '') {
+                    saweriaFrame.src = CONFIG.SAWERIA_URL;
+                }
+                saweriaFallback.href = CONFIG.SAWERIA_URL;
+            };
+
+            if (donateBtnMenu) donateBtnMenu.addEventListener('click', openDonationModal);
+            if (donateBtnOver) donateBtnOver.addEventListener('click', openDonationModal);
+
             // Event Listeners
             window.addEventListener('keydown', (e) => {
                 if (['ArrowUp', 'Space'].includes(e.code)) {
-                    e.preventDefault();
-                    game.handleInput();
+                    // Prevent default scrolling for Space
+                    if (e.code === 'Space') e.preventDefault();
+
+                    if (game.isActive && !game.isPaused) {
+                        game.handleInput();
+                    } else if (gameOverOverlay.style.display === 'flex') {
+                        // Space to restart on game over
+                        restartBtn.click();
+                    } else if (startOverlay.style.display !== 'none' && e.code === 'Space') {
+                        // Space to start game from main menu
+                        window.startGame();
+                    }
                 }
             });
 
@@ -140,7 +188,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }, { passive: false });
 
-            window.addEventListener('mousedown', () => {
+            window.addEventListener('mousedown', (e) => {
+                // Ignore clicks on buttons to prevent jumping when clicking controls
+                if (e.target.closest('button') || e.target.closest('.modal') || e.target.closest('.overlay')) return;
+
                 if (game.isActive) {
                     game.handleInput();
                 }
@@ -170,33 +221,40 @@ window.addEventListener('DOMContentLoaded', () => {
 
     leaderboardBtn.addEventListener('click', async () => {
         leaderboardModal.style.display = 'flex';
-        leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Loading...</td></tr>';
+        leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Loading data...</td></tr>';
 
         try {
             const scores = await getLeaderboard();
             leaderboardBody.innerHTML = '';
 
             if (scores.length === 0) {
-                leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Belum ada skor. Mainkan sekarang!</td></tr>';
+                leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Belum ada skor. Mainkan sekarang!</td></tr>';
                 return;
             }
 
             scores.forEach((s, index) => {
                 const tr = document.createElement('tr');
+
+                let rankContent = index + 1;
+                if (index === 0) rankContent = '<span class="rank-badge rank-1">1</span>';
+                if (index === 1) rankContent = '<span class="rank-badge rank-2">2</span>';
+                if (index === 2) rankContent = '<span class="rank-badge rank-3">3</span>';
+
                 tr.innerHTML = `
-                    <td>${index + 1}</td>
+                    <td>${rankContent}</td>
                     <td>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            ${s.photoURL ? `<img src="${s.photoURL}" style="width: 20px; height: 20px; border-radius: 50%;">` : ''}
-                            ${s.displayName || 'Anonymous'}
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            ${s.photoURL ? `<img src="${s.photoURL}" style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3);">` : '<div style="width: 24px; height: 24px; border-radius: 50%; background: #bdc3c7;"></div>'}
+                            <span style="font-weight: 500; color: white;">${s.displayName || 'Anonymous'}</span>
                         </div>
                     </td>
-                    <td>${s.score}</td>
+                    <td style="text-align: right; font-weight: bold; color: #f1c40f;">${s.score}</td>
                 `;
                 leaderboardBody.appendChild(tr);
             });
         } catch (error) {
-            leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Error loading leaderboard.</td></tr>';
+            console.error(error);
+            leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Gagal memuat leaderboard.</td></tr>';
         }
     });
 
