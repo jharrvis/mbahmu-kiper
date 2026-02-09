@@ -1,5 +1,5 @@
-const CACHE_NAME = 'nenek-scooter-v2';
-const STATIC_CACHE = 'nenek-static-v2';
+const CACHE_NAME = 'nenek-scooter-v3';
+const STATIC_CACHE = 'nenek-static-v3';
 
 // All assets to cache for offline play
 const urlsToCache = [
@@ -14,6 +14,10 @@ const urlsToCache = [
     '/js/config.js',
     '/js/preloader.js',
     '/js/audio-manager.js',
+    '/js/auth.js',
+    '/js/firebase-config.js',
+    '/js/leaderboard.js',
+    '/js/feedback.js',
     '/assets/img/nenek1.webp',
     '/assets/img/nenek2.webp',
     '/assets/img/hydrant.webp',
@@ -30,6 +34,8 @@ const urlsToCache = [
     '/assets/img/pedestrian2.webp',
     '/assets/img/pedestrian3.webp',
     '/assets/img/cursor.webp',
+    '/assets/img/batu.webp',
+    '/assets/img/lubang.webp',
     '/assets/audio/backsound1.mp3',
     '/assets/audio/backsounde2.mp3',
     '/assets/audio/items.wav',
